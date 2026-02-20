@@ -6,10 +6,27 @@ const supabase = createClient(
 );
 
 export async function handler(event: any) {
+
+  // 🔥 CORS HEADERS WAJIB
+  const headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS"
+  };
+
+  // Handle preflight
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers
+    };
+  }
+
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
-      body: "Method Not Allowed",
+      headers,
+      body: "Method Not Allowed"
     };
   }
 
@@ -19,7 +36,8 @@ export async function handler(event: any) {
     if (!token) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "No token provided" }),
+        headers,
+        body: JSON.stringify({ error: "No token provided" })
       };
     }
 
@@ -31,12 +49,15 @@ export async function handler(event: any) {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true }),
+      headers,
+      body: JSON.stringify({ success: true })
     };
-  } catch (err: any) {
+
+  } catch (error: any) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message }),
+      headers,
+      body: JSON.stringify({ error: error.message })
     };
   }
 }
