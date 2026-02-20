@@ -52,12 +52,3 @@ export async function handler(event: any) {
       headers,
       body: JSON.stringify({ success: true })
     };
-
-  } catch (error: any) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: error.message })
-    };
-  }
-}
