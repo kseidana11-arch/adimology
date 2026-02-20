@@ -6,15 +6,12 @@ const supabase = createClient(
 );
 
 export async function handler(event: any) {
-
-  // 🔥 CORS HEADERS WAJIB
   const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Methods": "POST, OPTIONS"
   };
 
-  // Handle preflight
   if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 200,
@@ -45,10 +42,27 @@ export async function handler(event: any) {
       .from("settings")
       .upsert({ key: "stockbit_token", value: token });
 
-    if (error) throw error;
+    if (error) {
+      console.error("SUPABASE ERROR:", error);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: error.message })
+      };
+    }
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({ success: true })
     };
+
+  } catch (err: any) {
+    console.error("GENERAL ERROR:", err);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: err.message })
+    };
+  }
+}
